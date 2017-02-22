@@ -3,6 +3,7 @@ package com.chrisonntag.backpack;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -25,16 +26,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.*;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
+import com.owncloud.android.lib.common.OwnCloudCredentials;
+import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
+import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -63,12 +64,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mBaseUrlView;
     private View mProgressView;
     private View mLoginFormView;
 
-    //Nextcloud Connection
-    private OwnCloudClient ownCloudClient;
-    private Handler ownCloud_Handler = new Handler();
+    public Authenticator mAsyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+        mBaseUrlView = (EditText) findViewById(R.id.baseUrl);
+        mBaseUrlView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
@@ -106,10 +108,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-        //connect to owncloud server
-        Uri serverUri = Uri.parse(getString(R.string.server_base_url));
-        ownCloudClient = OwnCloudClientFactory.createOwnCloudClient(serverUri, this, true);
     }
 
     private void populateAutoComplete() {
@@ -169,10 +167,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mBaseUrlView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String baseUrl = mBaseUrlView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -203,18 +203,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, baseUrl, this);
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
+        //TODO: Replace this with real logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
+        //TODO: Replace this with real logic
         return password.length() > 4;
     }
 
@@ -308,6 +308,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
+    public AppCompatActivity getActivity() {
+        return this;
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -316,32 +320,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        private final String mBaseUrl;
+        private Context mContext;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
+        //Nextcloud Connection
+        private OwnCloudClient ownCloudClient;
+        private Handler ownCloudHandler = new Handler();
+
+        UserLoginTask(String email, String password, String baseUrl, Context context) {
+            mEmail = email.trim();
             mPassword = password;
+            mBaseUrl = baseUrl;
+            mContext = context;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                //connect to owncloud server
+                Uri serverUri = Uri.parse(mBaseUrl);
+                ownCloudClient = OwnCloudClientFactory.createOwnCloudClient(serverUri, mContext, true);
+
+                OwnCloudCredentials credentials = OwnCloudCredentialsFactory.newBasicCredentials(mEmail, mPassword);
+                ownCloudClient.setCredentials(credentials);
+
+                ownCloudClient.getBaseUri();
+                ownCloudClient.getCredentials();
+            } catch (Exception e) {
+                e.printStackTrace();
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
             return true;
         }
 
@@ -351,7 +360,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                finish();
+                Toast.makeText(mContext, "Successfully logged in", Toast.LENGTH_SHORT).show();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
