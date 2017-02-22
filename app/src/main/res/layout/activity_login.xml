@@ -23,7 +23,7 @@
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_marginTop="90dp"
+            android:layout_marginTop="60dp"
             android:layout_height="wrap_content">
         <ImageView
                 android:layout_width="match_parent"
@@ -49,13 +49,12 @@
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorLightText"
                         android:textColorHint="@color/colorLightText"
                         android:textColorHighlight="@color/colorLightText"
                         android:hint="@string/prompt_email"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
-                        android:singleLine="true"/>
+                        android:singleLine="true" android:textColor="@color/colorLightText"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -76,6 +75,28 @@
                         android:imeActionLabel="@string/action_sign_in_short"
                         android:imeOptions="actionUnspecified"
                         android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <EditText
+                        android:id="@+id/baseUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_baseUrl"
+                        android:imeActionId="@+id/login"
+                        android:textColor="@color/colorLightText"
+                        android:textColorHint="@color/colorLightText"
+                        android:textColorHighlight="@color/colorLightText"
+                        android:textColorLink="@color/colorLightText"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="textUri"
                         android:maxLines="1"
                         android:singleLine="true"/>
 

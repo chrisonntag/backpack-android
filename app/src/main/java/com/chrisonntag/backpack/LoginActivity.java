@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.owncloud.android.lib.common.OwnCloudClient;
+import com.owncloud.android.lib.common.OwnCloudClientFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +65,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    //Nextcloud Connection
+    private OwnCloudClient ownCloudClient;
+    private Handler ownCloud_Handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +106,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        //connect to owncloud server
+        Uri serverUri = Uri.parse(getString(R.string.server_base_url));
+        ownCloudClient = OwnCloudClientFactory.createOwnCloudClient(serverUri, this, true);
     }
 
     private void populateAutoComplete() {
