@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +33,18 @@ import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentials;
 import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
+import org.apache.commons.httpclient.HttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -310,6 +322,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return this;
     }
 
+    public void openMainActivity() {
+
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -332,8 +348,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mContext = context;
         }
 
+        public void generateToken(String urlString, String username, String password) throws IOException, JSONException {
+
+        }
+
         @Override
         protected Boolean doInBackground(Void... params) {
+
             try {
                 //connect to owncloud server
                 Uri serverUri = Uri.parse(mBaseUrl);
@@ -359,6 +380,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 Toast.makeText(mContext, "Successfully logged in", Toast.LENGTH_SHORT).show();
+                openMainActivity();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
