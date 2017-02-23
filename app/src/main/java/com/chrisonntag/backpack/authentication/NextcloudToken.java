@@ -33,7 +33,7 @@ public class NextcloudToken {
         this.token = "ABC";
     }
 
-    public String getToken() {
+    public String toString() {
         return this.token;
     }
 

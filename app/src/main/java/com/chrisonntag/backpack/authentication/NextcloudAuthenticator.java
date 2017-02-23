@@ -20,6 +20,14 @@ public class NextcloudAuthenticator {
         }
     }
 
+    public NextcloudToken getToken(){
+        return this.token;
+    }
+
+    public boolean connect() {
+        return true;
+    }
+
     public boolean loggedIn() {
         return true;
     }

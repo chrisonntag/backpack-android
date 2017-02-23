@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -28,10 +29,8 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
-import com.owncloud.android.lib.common.OwnCloudClient;
-import com.owncloud.android.lib.common.OwnCloudClientFactory;
-import com.owncloud.android.lib.common.OwnCloudCredentials;
-import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
+import com.chrisonntag.backpack.authentication.NextcloudAuthenticator;
+import com.owncloud.android.lib.common.*;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import org.apache.commons.httpclient.HttpClient;
 import org.json.JSONException;
@@ -323,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     public void openMainActivity() {
-
+        Intent intent = new Intent();
     }
 
     /**
@@ -332,7 +331,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
+        private final String mUsername;
         private final String mPassword;
         private final String mBaseUrl;
         private Context mContext;
@@ -341,35 +340,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private OwnCloudClient ownCloudClient;
         private Handler ownCloudHandler = new Handler();
 
-        UserLoginTask(String email, String password, String baseUrl, Context context) {
-            mEmail = email.trim();
+        UserLoginTask(String username, String password, String baseUrl, Context context) {
+            mUsername= username.trim();
             mPassword = password;
             mBaseUrl = baseUrl;
             mContext = context;
-        }
-
-        public void generateToken(String urlString, String username, String password) throws IOException, JSONException {
-
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
 
             try {
-                //connect to owncloud server
-                Uri serverUri = Uri.parse(mBaseUrl);
-                ownCloudClient = OwnCloudClientFactory.createOwnCloudClient(serverUri, mContext, true);
-
-                OwnCloudCredentials credentials = OwnCloudCredentialsFactory.newBasicCredentials(mEmail, mPassword);
-                ownCloudClient.setCredentials(credentials);
-
-                ownCloudClient.getBaseUri();
-                ownCloudClient.getCredentials();
+                NextcloudAuthenticator authenticator = new NextcloudAuthenticator(mUsername, mPassword, mBaseUrl);
+                authenticator.connect();
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
-
             return true;
         }
 
