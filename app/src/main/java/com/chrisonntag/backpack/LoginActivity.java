@@ -1,5 +1,6 @@
 package com.chrisonntag.backpack;
 
+import android.accounts.Account;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -59,6 +60,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+
+    /**
+     * used for sending an account to the MainActivity
+     */
+    public final static String MAIN_ACCOUNT = "com.chrisonntag.backpack.ACCOUNT";
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -321,8 +327,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return this;
     }
 
-    public void openMainActivity() {
-        Intent intent = new Intent();
+    public void openMainActivity(Account account) {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MAIN_ACCOUNT, account);
+        startActivity(intent);
     }
 
     /**
@@ -367,7 +375,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 Toast.makeText(mContext, "Successfully logged in", Toast.LENGTH_SHORT).show();
-                openMainActivity();
+
+                Account account = null;
+                openMainActivity(account);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
