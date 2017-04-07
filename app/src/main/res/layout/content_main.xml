@@ -14,12 +14,8 @@
         tools:showIn="@layout/app_bar_main"
         tools:context="com.chrisonntag.backpack.MainActivity">
 
-    <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-    </LinearLayout>
+    <ListView
+        android:id="@+id/linkList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
 </RelativeLayout>
