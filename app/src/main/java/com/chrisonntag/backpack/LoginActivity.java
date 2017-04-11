@@ -36,6 +36,8 @@ import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import org.apache.commons.httpclient.HttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,6 +91,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                            .setDefaultFontPath("fonts/overpass-light.ttf")
+                            .setFontAttrId(R.attr.fontPath)
+                            .build()
+            );
+
         //hide ActionBar; AppCompat v7 needs getSupportActionBar instead of getActionBar
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getSupportActionBar().hide();
@@ -123,6 +131,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void populateAutoComplete() {
