@@ -1,4 +1,4 @@
-package com.chrisonntag.backpack;
+package com.chrisonntag.backpack.helper;
 
 import android.util.Log;
 

@@ -21,7 +21,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
-import org.apache.commons.httpclient.HttpClient;
+import com.chrisonntag.backpack.helper.HttpHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
