@@ -30,6 +30,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity
     private String TAG = MainActivity.class.getSimpleName();
 
     private ProgressDialog pDialog;
-    private ListView lv;
+    private ListView listView;
 
     // URL to get contacts JSON
     private static String url = "http://test.chrisonntag.com/backpack/data.json";
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity
     private void loadData() {
         linkList = new ArrayList<>();
 
-        lv = (ListView) findViewById(R.id.linkList);
+        listView = (ListView) findViewById(R.id.linkList);
         new LinkLoader().execute();
     }
 
@@ -169,23 +171,26 @@ public class MainActivity extends AppCompatActivity
 
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url);
-
             Log.e(TAG, "Response from url: " + jsonStr);
+
+            Pattern link_pattern = Pattern.compile("^(([^:/?#]+):)?(\\/\\/([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
                     // Getting JSON Array node
-                    JSONArray contacts = jsonObj.getJSONArray("data");
+                    JSONArray links = jsonObj.getJSONArray("data");
 
                     // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
+                    for (int i = 0; i < links.length(); i++) {
+                        JSONObject c = links.getJSONObject(i);
 
                         String id_json = c.getString("id");
                         String title_json = c.getString("title");
-                        String link_json = c.getString("link");
+
+                        Matcher link_matcher = link_pattern.matcher(c.getString("link"));
+                        String link_json = link_matcher.matches() ? link_matcher.group(4) : c.getString("link");
 
                         // tmp hash map for single contact
                         HashMap<String, String> link = new HashMap<>();
@@ -242,7 +247,7 @@ public class MainActivity extends AppCompatActivity
                     R.layout.list_item, new String[]{"title", "link"},
                     new int[]{R.id.title, R.id.link});
 
-            lv.setAdapter(adapter);
+            listView.setAdapter(adapter);
         }
 
     }
