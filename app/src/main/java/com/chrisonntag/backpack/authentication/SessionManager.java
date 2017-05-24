@@ -1,4 +1,4 @@
-package com.chrisonntag.backpack.helper;
+package com.chrisonntag.backpack.authentication;
 
 import android.content.Context;
 import android.content.SharedPreferences;
